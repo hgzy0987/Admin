@@ -1,0 +1,124 @@
+<!-- HGZY Admin Panel -->
+<div id="admin-panel">
+  <style>
+    #admin-panel {
+      max-width: 400px;
+      margin: 40px auto;
+      padding: 20px;
+      border-radius: 12px;
+      background: linear-gradient(145deg, #1a1a1a, #000);
+      box-shadow: 0 0 20px #FFD70055;
+      font-family: 'Poppins', sans-serif;
+      color: #FFD700;
+    }
+
+    #admin-panel h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 20px;
+      text-shadow: 0 0 8px #FFD700;
+    }
+
+    .input-group {
+      margin-bottom: 15px;
+    }
+
+    .input-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 500;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #FFD70066;
+      background: #111;
+      color: #fff;
+      font-size: 14px;
+    }
+
+    #updateBtn {
+      width: 100%;
+      padding: 12px;
+      background: #FFD700;
+      color: #000;
+      font-weight: bold;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    #updateBtn:hover {
+      background: #e6c200;
+    }
+
+    #statusMsg {
+      margin-top: 12px;
+      text-align: center;
+      font-size: 13px;
+    }
+  </style>
+
+  <h2>HGZY Admin Signal Update</h2>
+  <div class="input-group">
+    <label for="box1">Box 1</label>
+    <input type="text" id="box1" placeholder="Enter signal for Box 1">
+  </div>
+  <div class="input-group">
+    <label for="box2">Box 2</label>
+    <input type="text" id="box2" placeholder="Enter signal for Box 2">
+  </div>
+  <div class="input-group">
+    <label for="box3">Box 3</label>
+    <input type="text" id="box3" placeholder="Enter signal for Box 3">
+  </div>
+  <button id="updateBtn">Update Signal</button>
+  <div id="statusMsg"></div>
+</div>
+
+<!-- Firebase Scripts -->
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyDNA3h0fExL49Bth-G8nnw_PZ_laNn2tUc",
+    authDomain: "hgzy-signal-gpt.firebaseapp.com",
+    projectId: "hgzy-signal-gpt",
+    storageBucket: "hgzy-signal-gpt.appspot.com",
+    messagingSenderId: "898048478460",
+    appId: "1:898048478460:web:78091c7128f9193f27db79"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+
+  const box1Input = document.getElementById("box1");
+  const box2Input = document.getElementById("box2");
+  const box3Input = document.getElementById("box3");
+  const updateBtn = document.getElementById("updateBtn");
+  const statusMsg = document.getElementById("statusMsg");
+
+  updateBtn.addEventListener("click", () => {
+    const box1 = box1Input.value.trim();
+    const box2 = box2Input.value.trim();
+    const box3 = box3Input.value.trim();
+
+    db.collection("signals").doc("live").set({
+      box1, box2, box3
+    })
+    .then(() => {
+      statusMsg.innerText = "Signal Updated Successfully!";
+      statusMsg.style.color = "#0f0";
+    })
+    .catch((error) => {
+      console.error("Error updating:", error);
+      statusMsg.innerText = "Error updating signal!";
+      statusMsg.style.color = "#f00";
+    });
+  });
+</script>

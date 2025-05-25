@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin Panel - Live Status Control</title>
+  <style>
+    body {
+      background: #121212;
+      color: #00ff99;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px;
+      min-height: 100vh;
+      margin: 0;
+    }
+    h1 {
+      margin-bottom: 18px;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+    }
+    .btn-container {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+    button {
+      background: linear-gradient(145deg, #004d00, #007700);
+      border: none;
+      padding: 14px 28px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border-radius: 12px;
+      color: #d1ffd1;
+      cursor: pointer;
+      box-shadow: 0 0 12px #00ff44cc;
+      transition: transform 0.2s ease, box-shadow 0.3s ease;
+      user-select: none;
+    }
+    button:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 25px #00ff88dd;
+    }
+    #statusDisplay {
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: #00ff88;
+      text-shadow: 0 0 5px #00ff88bb;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Admin Panel - Live Status Control</h1>
+
+  <div class="btn-container">
+    <button id="btnLive">Set LIVE</button>
+    <button id="btnOffline">Set OFFLINE</button>
+  </div>
+
+  <div id="statusDisplay">Current Status: <span id="currentStatus">Loading...</span></div>
+
+  <!-- Firebase SDKs -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDNA3h0fExL49Bth-G8nnw_PZ_laNn2tUc",
+      authDomain: "hgzy-signal-gpt.firebaseapp.com",
+      projectId: "hgzy-signal-gpt",
+      storageBucket: "hgzy-signal-gpt.firebasestorage.app",
+      messagingSenderId: "898048478460",
+      appId: "1:898048478460:web:78091c7128f9193f27db79",
+      measurementId: "G-LQH91EEL96"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const statusDoc = doc(db, "admin", "status");
+
+    // Elements
+    const btnLive = document.getElementById("btnLive");
+    const btnOffline = document.getElementById("btnOffline");
+    const currentStatus = document.getElementById("currentStatus");
+
+    // Set status function
+    async function setStatus(value) {
+      try {
+        await setDoc(statusDoc, { status: value });
+      } catch (e) {
+        alert("Error updating status: " + e.message);
+      }
+    }
+
+    // Event Listeners
+    btnLive.addEventListener("click", () => setStatus("live"));
+    btnOffline.addEventListener("click", () => setStatus("offline"));
+
+    // Listen to status changes in real-time
+    onSnapshot(statusDoc, (docSnap) => {
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        currentStatus.textContent = data.status.toUpperCase();
+        currentStatus.style.color = data.status === "live" ? "#00ff44" : "#ff4444";
+        currentStatus.style.textShadow = data.status === "live" ? "0 0 10px #00ff44" : "0 0 10px #ff4444";
+      } else {
+        currentStatus.textContent = "NOT SET";
+        currentStatus.style.color = "#999";
+        currentStatus.style.textShadow = "none";
+      }
+    });
+  </script>
+</body>
+</html>

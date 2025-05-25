@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Panel - Payment Orders</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #111;
+      color: #fff;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+    }
+    .card {
+      background: #1e1e1e;
+      border-left: 5px solid #00c853;
+      margin-bottom: 15px;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    }
+    .status {
+      padding: 5px 10px;
+      border-radius: 5px;
+      display: inline-block;
+      margin-top: 10px;
+    }
+    .seen {
+      background: #00c853;
+      color: #fff;
+    }
+    .unseen {
+      background: #ff1744;
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+  <h1>Payment Orders</h1>
+  <div id="orderList"></div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDNA3h0fExL49Bth-G8nnw_PZ_laNn2tUc",
+      authDomain: "hgzy-signal-gpt.firebaseapp.com",
+      projectId: "hgzy-signal-gpt",
+      storageBucket: "hgzy-signal-gpt.firebasestorage.app",
+      messagingSenderId: "898048478460",
+      appId: "1:898048478460:web:78091c7128f9193f27db79",
+      measurementId: "G-LQH91EEL96"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    const orderList = document.getElementById("orderList");
+
+    function renderOrder(doc) {
+      const data = doc.data();
+      const card = document.createElement("div");
+      card.className = "card";
+
+      card.innerHTML = `
+        <strong>Name:</strong> ${data.name || 'N/A'}<br>
+        <strong>Email:</strong> ${data.email || 'N/A'}<br>
+        <strong>Telegram:</strong> ${data.telegram || 'N/A'}<br>
+        <strong>Password:</strong> ${data.password || 'N/A'}<br>
+        <strong>Package:</strong> ${data.package || 'N/A'}<br>
+        <strong>Payment Method:</strong> ${data.paymentMethod || 'N/A'}<br>
+        <strong>Transaction ID:</strong> ${data.transactionId || 'N/A'}<br>
+        <strong>Amount:</strong> ${data.amount || 'N/A'}<br>
+        <strong>Time:</strong> ${data.timestamp?.toDate().toLocaleString() || 'N/A'}<br>
+        <span class="status ${data.seen ? 'seen' : 'unseen'}">${data.seen ? 'Seen' : 'Unseen'}</span>
+      `;
+
+      orderList.appendChild(card);
+
+      // Mark as seen if not already
+      if (!data.seen) {
+        db.collection("payments").doc(doc.id).update({ seen: true });
+      }
+    }
+
+    db.collection("payments")
+      .orderBy("timestamp", "desc")
+      .onSnapshot((snapshot) => {
+        orderList.innerHTML = "";
+        snapshot.forEach((doc) => renderOrder(doc));
+      });
+  </script>
+</body>
+</html>
