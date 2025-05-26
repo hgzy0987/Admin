@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Panel - Proof Submissions</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: #0f172a;
+      color: #fff;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #38bdf8;
+    }
+    .entry {
+      background: #1e293b;
+      padding: 15px;
+      margin-bottom: 15px;
+      border-radius: 12px;
+      box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+    }
+    .entry h3 {
+      margin: 0 0 10px;
+      font-size: 18px;
+      color: #facc15;
+    }
+    .entry p {
+      margin: 4px 0;
+      font-size: 15px;
+    }
+    .entry img {
+      max-width: 100%;
+      margin-top: 10px;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Proof Submissions (HGZY)</h1>
+  <div id="submissionsContainer"></div>
+
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDNA3h0fExL49Bth-G8nnw_PZ_laNn2tUc",
+      authDomain: "hgzy-signal-gpt.firebaseapp.com",
+      projectId: "hgzy-signal-gpt",
+      storageBucket: "hgzy-signal-gpt.firebasestorage.app",
+      messagingSenderId: "898048478460",
+      appId: "1:898048478460:web:78091c7128f9193f27db79",
+      measurementId: "G-LQH91EEL96"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    const container = document.getElementById('submissionsContainer');
+
+    db.collection("proof_submissions").orderBy("timestamp", "desc").onSnapshot(snapshot => {
+      container.innerHTML = '';
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        const entry = document.createElement('div');
+        entry.className = 'entry';
+        entry.innerHTML = `
+          <h3>${data.name} (${data.uid})</h3>
+          <p><strong>Email:</strong> ${data.email}</p>
+          <p><strong>Telegram:</strong> ${data.telegram}</p>
+          <p><strong>1st Deposit:</strong> ${data.depositAmount || 'N/A'}</p>
+          <p><strong>Submitted:</strong> ${new Date(data.timestamp).toLocaleString()}</p>
+          <img src="${data.imageUrl}" alt="Profile Screenshot">
+        `;
+        container.appendChild(entry);
+      });
+    });
+  </script>
+</body>
+</html>
